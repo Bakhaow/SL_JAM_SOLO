@@ -1,0 +1,16 @@
+[
+{
+  "modid": "worldglorymenu",
+  "name": "World Glory Meny Mod",
+  "description": "BKMenu",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Bakhaow"],
+  "credits": "The Forge and FML guys, for making this example",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
