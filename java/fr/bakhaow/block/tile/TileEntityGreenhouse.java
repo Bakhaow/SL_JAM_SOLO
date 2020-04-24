@@ -1,6 +1,5 @@
 package fr.bakhaow.block.tile;
 
-import fr.bakhaow.utils.IMachine;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -8,7 +7,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 
-public class TileEntityGreenhouse extends TileEntity implements IInventory, IMachine{
+public class TileEntityGreenhouse extends TileEntity implements IInventory{
     
 	private ItemStack[] inventory;
 	private int updateCounter = 0;
@@ -21,23 +20,7 @@ public class TileEntityGreenhouse extends TileEntity implements IInventory, IMac
     public TileEntityGreenhouse(int x, int y, int z){
     	this.inventory = new ItemStack[4];
     }
-    
-    @Override
-    public void updateEntity() {
-    	if(!worldObj.isRemote) {
-        	if(updateCounter == 20) { // 1 SEC
-        		updateCounter = 0;
-        		ticked();
-        	} else {
-        		++updateCounter;
-        	}
-    	}
-    }
-    
-    public void ticked() {
-    	
-    }
-    
+
     @Override
     public void readFromNBT(NBTTagCompound data) {
         super.readFromNBT(data);

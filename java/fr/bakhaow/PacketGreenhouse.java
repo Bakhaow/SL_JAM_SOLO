@@ -17,19 +17,19 @@ import net.minecraft.world.World;
 public class PacketGreenhouse implements IMessage {
 
 	private boolean isMessageValid = false;
-	private static int x, y, z, xs, zs, s, p;
+	private static int x, y, z, xs, zs, p, s;
 
 	public PacketGreenhouse() {
 	}
 
-	public PacketGreenhouse(int x, int y, int z, int xs, int zs, int s, int p) {
+	public PacketGreenhouse(int x, int y, int z, int xs, int zs, int p, int s) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.xs = xs;
 		this.zs = zs;
-		this.s = s;
 		this.p = p;
+		this.s = s;
 		this.isMessageValid = true;
 	}
 
@@ -40,8 +40,8 @@ public class PacketGreenhouse implements IMessage {
 		this.z = buf.readInt();
 		this.xs = buf.readInt();
 		this.zs = buf.readInt();
-		this.s = buf.readInt();
 		this.p = buf.readInt();
+		this.s = buf.readInt();
 		this.isMessageValid = true;
 	}
 
@@ -54,8 +54,8 @@ public class PacketGreenhouse implements IMessage {
 		buf.writeInt(this.z);
 		buf.writeInt(this.xs);
 		buf.writeInt(this.zs);
-		buf.writeInt(this.s);
 		buf.writeInt(this.p);
+		buf.writeInt(this.s);
 	}
 
 	public static class PacketGreenhouseHandler implements IMessageHandler<PacketGreenhouse, IMessage> {

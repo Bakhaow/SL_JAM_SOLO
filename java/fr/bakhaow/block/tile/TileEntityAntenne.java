@@ -38,18 +38,12 @@ public class TileEntityAntenne extends TileEntity implements IInventory{
     		if(this.getStackInSlot(i) != null) {
     			if(this.getStackInSlot(i).getItem().equals(Item.getItemFromBlock(Blocks.diamond_block))) {
         			count++;
-        			System.out.println(count);
     			} else {
-                    this.decrStackSize(i, 1);
-    				/*ItemStack stack = this.getStackInSlot(i);
-    				EntityItem entityitem = new EntityItem(this.worldObj, this.xCoord, this.yCoord + 1, this.zCoord, stack);
-    				entityitem.delayBeforeCanPickup = 10;
-    				this.worldObj.spawnEntityInWorld(entityitem);*/
+    				this.setInventorySlotContents(i, null);
     			}
     		}
     	}
     	radius += count * 2;
-    	System.out.println(" e = " + this.energy);
     }
     
     @Override
