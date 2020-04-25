@@ -81,6 +81,12 @@ public class PacketGreenhouse implements IMessage {
 						player.addChatMessage(new ChatComponentText(EnumChatFormatting.DARK_GREEN + "Un esclave arrive sur place!"));
 						usePower(w, x, y, z, p);
 						create(w, xBis, y, z, xs, zs, s, sc, sp, sn);
+						t.wheat = s;
+						t.carrot = sc;
+						t.potato = sp;
+						t.netherwart = sn;
+						t.xs = xs;
+						t.zs = zs;
 					} else {
 						player.addChatMessage(new ChatComponentText(EnumChatFormatting.DARK_RED + "QUOI!"));
 						player.addChatMessage(new ChatComponentText(EnumChatFormatting.DARK_RED + "... T'es aveugle?"));

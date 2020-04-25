@@ -40,7 +40,7 @@ public class TileEntityBurner extends TileEntity implements IInventory, IProduce
     			this.sendEnergy(worldObj, this.xCoord, this.yCoord, this.zCoord, energy, debit);
     		}
     	}
-    	for(int i = 0; i < 2; i++) {
+    	for(int i = 0; i < 4; i++) {
     		ItemStack s = this.getStackInSlot(i);
     		if(s != null) {
     			if(isBurnable(s)) {

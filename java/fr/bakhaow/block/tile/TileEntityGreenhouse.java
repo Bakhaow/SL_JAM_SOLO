@@ -1,150 +1,75 @@
 package fr.bakhaow.block.tile;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 
-public class TileEntityGreenhouse extends TileEntity implements IInventory{
+public class TileEntityGreenhouse extends TileEntity {
     
-	private ItemStack[] inventory;
 	private int updateCounter = 0;
-	private int stages;
-	private int wheat;
-	private int potato;
-	private int	carrot;
-	private int netherwart;
-	
-    public TileEntityGreenhouse(int x, int y, int z){
-    	this.inventory = new ItemStack[4];
-    }
+	public int wheat, potato, carrot, netherwart, xs, zs;
+	public boolean autoReplant;
 
+    @Override
+    public void updateEntity() {
+    	if(!worldObj.isRemote && autoReplant) {
+        	if(updateCounter == 20 * 3) { // 3 * 1 Sec
+        		ticked();
+        		updateCounter = 0;
+        	} else {
+        		++updateCounter;
+        	}
+    	}
+    }
+    
+    public void ticked() {
+    	int x = this.xCoord + 1;
+		int ys = (wheat + carrot + potato + netherwart) * 3;
+		for(int i = 0; i < xs; i++) {
+			for(int j = 0; j < zs; j++) {
+				for(int k = 0; k < ys; k++) {
+					Block b = this.getWorldObj().getBlock(x + i, this.yCoord + k, this.zCoord + j);
+					if(b.equals(Blocks.wheat) && this.getWorldObj().getBlockMetadata(x + i, this.yCoord + k, this.zCoord + j) == 7) {
+						this.worldObj.setBlock(x + i, this.yCoord + k, this.zCoord + j, Blocks.wheat);
+					} else if(b.equals(Blocks.carrots) && this.getWorldObj().getBlockMetadata(x + i, this.yCoord + k, this.zCoord + j) == 7) {
+						this.worldObj.setBlock(x + i, this.yCoord + k, this.zCoord + j, Blocks.carrots);
+					} else if(b.equals(Blocks.potatoes) && this.getWorldObj().getBlockMetadata(x + i, this.yCoord + k, this.zCoord + j) == 7) {
+						this.worldObj.setBlock(x + i, this.yCoord + k, this.zCoord + j, Blocks.potatoes);
+					} else if(b.equals(Blocks.nether_wart) && this.getWorldObj().getBlockMetadata(x + i, this.yCoord + k, this.zCoord + j) == 7) {
+						this.worldObj.setBlock(x + i, this.yCoord + k, this.zCoord + j, Blocks.nether_wart);
+					}
+				}
+			}
+		}
+    }
+    
     @Override
     public void readFromNBT(NBTTagCompound data) {
         super.readFromNBT(data);
-        NBTTagList nbttaglist = data.getTagList("ItemStacks", 10);
-        this.inventory = new ItemStack[this.getSizeInventory()];
-        for (int i = 0; i < nbttaglist.tagCount(); ++i) {
-            NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
-            int j = nbttagcompound1.getByte("Slot") & 255;
-            if (j >= 0 && j < this.inventory.length) {
-                this.inventory[j] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
-            }
-        }
- 
-        this.stages = data.getShort("stages");
         this.wheat = data.getShort("wheat");
         this.potato = data.getShort("potato");
         this.carrot = data.getShort("carrot");
         this.netherwart = data.getShort("netherwart");
+        this.xs = data.getShort("xs");
+        this.zs = data.getShort("zs");
+        this.autoReplant = data.getBoolean("autoReplant");
     }
     
     @Override
     public void writeToNBT(NBTTagCompound data) {
         super.writeToNBT(data);
-        NBTTagList nbttaglist = new NBTTagList();
-        for (int i = 0; i < this.inventory.length; ++i) {
-            if (this.inventory[i] != null) {
-                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-                nbttagcompound1.setByte("Slot", (byte)i);
-                this.inventory[i].writeToNBT(nbttagcompound1);
-                nbttaglist.appendTag(nbttagcompound1);
-            }
-        }
- 
-        data.setTag("ItemStacks", nbttaglist);
-        data.setShort("stages",(short)this.stages);
         data.setShort("wheat", (short)this.wheat);
         data.setShort("potato", (short)this.potato);
         data.setShort("carrot", (short)this.carrot);
         data.setShort("netherwart", (short)this.netherwart);
+        data.setShort("xs", (short)this.xs);
+        data.setShort("zs", (short)this.zs);
+        data.setBoolean("autoReplant", this.autoReplant);
     }
 
-	@Override
-	public int getSizeInventory() {
-		return inventory.length;
-	}
-
-	@Override
-	public ItemStack getStackInSlot(int i) {
-		return inventory[i];
-	}
-    @Override
-    public ItemStack decrStackSize(int i, int count) {
-            if (this.inventory[i] != null) {
-                ItemStack itemstack;
-                if (this.inventory[i].stackSize <= count) {
-                    itemstack = this.inventory[i];
-                    this.inventory[i] = null;
-                    this.markDirty();
-                    return itemstack;
-                } else {
-                    itemstack = this.inventory[i].splitStack(count);
-                    if (this.inventory[i].stackSize == 0) {
-                        this.inventory[i] = null;
-                    }
-                    this.markDirty();
-                    return itemstack;
-                }
-            } else {
-                return null;
-            }
-    }
- 
-    @Override
-    public ItemStack getStackInSlotOnClosing(int i) {
-        if (this.inventory[i] != null) {
-            ItemStack itemstack = this.inventory[i];
-            this.inventory[i] = null;
-            return itemstack;
-        } else {
-            return null;
-        }
-    }
- 
-    @Override
-    public void setInventorySlotContents(int i, ItemStack s) {
-        this.inventory[i] = s;
-        if (s != null && s.stackSize > this.getInventoryStackLimit()) {
-            s.stackSize = this.getInventoryStackLimit();
-        }
-        this.markDirty();
-    }
- 
-    @Override
-    public String getInventoryName() {
-        return "tile.antenne";
-    }
- 
-    @Override
-    public boolean hasCustomInventoryName() {
-        return false;
-    }
- 
-    @Override
-    public int getInventoryStackLimit() {
-        return 1;
-    }
- 
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer player) {
-        return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : player.getDistanceSq((double)this.xCoord + 0.5D, (double)this.yCoord + 0.5D, (double)this.zCoord + 0.5D) <= 64.0D;
-    }
- 
-    @Override
-    public void openInventory() {
- 
-    }
- 
-    @Override
-    public void closeInventory() {
- 
-    }
-
-	@Override
-	public boolean isItemValidForSlot(int i, ItemStack s) {
-		return false;
-	}
 }

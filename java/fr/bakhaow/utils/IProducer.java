@@ -14,10 +14,8 @@ public interface IProducer {
 				for(int k = 0; k < 255; k++) {
 					Block b = w.getBlock(x + i, y + k, z + j);
 					if(b.equals(ModBlocks.antenne)) {
-						System.out.println("x = " + i + "; y = " + k + "; z = " + j);
 						TileEntityAntenne t = (TileEntityAntenne) w.getTileEntity(x + i, y + k, z + j);
 						if(!(i > t.radius|| j > t.radius)) {
-							System.out.println("COO : " + x + i + " | " +  y + k + " | " + z + j);
 							return true;
 						}
 					}
@@ -36,13 +34,10 @@ public interface IProducer {
 						TileEntityAntenne t = (TileEntityAntenne) w.getTileEntity(x + i, y + k, z + j);
 						if(!(i > t.radius|| j > t.radius)) {
 							if(i + j >= t.radius) {
-								System.out.println("DEBIT " + 0.5);
 								return 0.5;
 							} else if(i + j <= 1) {
-								System.out.println("DEBIT " + 1);
 								return 1;
 							} else {
-								System.out.println("DEBIT " + ((i + j) / t.radius / 2) + 0.5);
 								return ((i + j) / t.radius / 2) + 0.5;
 							}
 						}
