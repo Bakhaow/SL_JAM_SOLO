@@ -32,10 +32,10 @@ public class GuiGreenhouse extends GuiContainer {
         this.buttonList.add(new GuiButton(1, this.width / 2 - 50, this.height / 2 + 10, 100, 20, "Retour au jeu"));
         this.xs = new GuiTextField(this.fontRendererObj, this.width / 4 - this.width / 8, this.height / 3, this.width / 4, 20);
         this.zs = new GuiTextField(this.fontRendererObj, this.width / 4 * 3 - this.width / 8, this.height / 3, this.width / 4, 20);
-        this.s = new GuiTextField(this.fontRendererObj, 0, this.height / 3 * 2, this.width * 8 / 40, 20);
-        this.sc = new GuiTextField(this.fontRendererObj, this.width / 4, this.height / 3 * 2, this.width * 8 / 40, 20);
-        this.sp = new GuiTextField(this.fontRendererObj, this.width / 2, this.height / 3 * 2, this.width * 8 / 40, 20);
-        this.sn = new GuiTextField(this.fontRendererObj, this.width / 4 * 3, this.height / 3 * 2, this.width * 8 / 40, 20);
+        this.s = new GuiTextField(this.fontRendererObj, 10, this.height / 3 * 2 + 15, this.width * 8 / 40, 20);
+        this.sc = new GuiTextField(this.fontRendererObj, this.width / 4 + 10, this.height / 3 * 2 + 15, this.width * 8 / 40, 20);
+        this.sp = new GuiTextField(this.fontRendererObj, this.width / 2 + 10, this.height / 3 * 2 + 15, this.width * 8 / 40, 20);
+        this.sn = new GuiTextField(this.fontRendererObj, this.width / 4 * 3 + 10, this.height / 3 * 2 + 15, this.width * 8 / 40, 20);
         this.xs.setFocused(false);
         this.xs.setText("2");
         this.zs.setFocused(false);
@@ -62,9 +62,12 @@ public class GuiGreenhouse extends GuiContainer {
 			int xsInt = Integer.parseInt(this.xs.getText());
 			int zsInt = Integer.parseInt(this.zs.getText());
 			int sInt = Integer.parseInt(this.s.getText());
-			int price = (xsInt + zsInt * sInt) * 30;
-			Main.networkWrapper.sendToServer(new PacketGreenhouse(tile.xCoord, tile.yCoord, tile.zCoord, xsInt, zsInt, price, sInt));
-    		this.mc.displayGuiScreen((GuiScreen)null);
+			int scInt = Integer.parseInt(this.sc.getText());
+			int spInt = Integer.parseInt(this.sp.getText());
+			int snInt = Integer.parseInt(this.sn.getText());
+			int price = (xsInt + zsInt * (sInt + spInt + snInt)) * 30;
+			Main.networkWrapper.sendToServer(new PacketGreenhouse(tile.xCoord, tile.yCoord, tile.zCoord, xsInt, zsInt, price, sInt, scInt, spInt, snInt));
+			this.mc.displayGuiScreen((GuiScreen)null);
             this.mc.setIngameFocus();
     	} else if(btn.id == 1) {
             this.mc.displayGuiScreen((GuiScreen)null);
@@ -98,8 +101,8 @@ public class GuiGreenhouse extends GuiContainer {
         this.zs.mouseClicked(x, y, btn);
         this.s.mouseClicked(x, y, btn);
         this.sc.mouseClicked(x, y, btn);
-        /*this.sp.mouseClicked(x, y, btn);
-        this.sn.mouseClicked(x, y, btn);*/
+        this.sp.mouseClicked(x, y, btn);
+        this.sn.mouseClicked(x, y, btn);
     }
 
     protected void drawGuiContainerForegroundLayer(int x, int y) {
@@ -109,10 +112,13 @@ public class GuiGreenhouse extends GuiContainer {
         this.sc.drawTextBox();
         this.sp.drawTextBox();
         this.sn.drawTextBox();
-        this.fontRendererObj.drawString(EnumChatFormatting.GOLD + "Greenhouse", 0, 6, Int.MinValue());
-        this.fontRendererObj.drawString(EnumChatFormatting.DARK_GREEN + "Largeur:", this.width / 4 - this.width / 8, this.height / 3 - 10, Int.MaxValue());
-        this.fontRendererObj.drawString(EnumChatFormatting.DARK_GREEN + "Longueur:", this.width / 4 * 3 - this.width / 8, this.height / 3 - 10, Int.MaxValue());
-        this.fontRendererObj.drawString(EnumChatFormatting.BLUE + "Blé", 0, 6, Int.MinValue());
+        this.fontRendererObj.drawString(EnumChatFormatting.GOLD + "Greenhouse", this.width / 2 - this.fontRendererObj.getStringWidth("Greenhouse") / 2 , 15, Int.MinValue());
+        this.fontRendererObj.drawString(EnumChatFormatting.DARK_GREEN + "Width:", this.width / 4 - this.width / 8, this.height / 3 - 10, Int.MaxValue());
+        this.fontRendererObj.drawString(EnumChatFormatting.DARK_GREEN + "Length:", this.width / 4 * 3 - this.width / 8, this.height / 3 - 10, Int.MaxValue());
+        this.fontRendererObj.drawString(EnumChatFormatting.BLUE + "Wheat:", 10, this.height / 3 * 2, Int.MinValue());
+        this.fontRendererObj.drawString(EnumChatFormatting.BLUE + "Carrot:", this.width / 4 + 10, this.height / 3 * 2, Int.MinValue());
+        this.fontRendererObj.drawString(EnumChatFormatting.BLUE + "Potato:", this.width / 2 + 10, this.height / 3 * 2, Int.MinValue());
+        this.fontRendererObj.drawString(EnumChatFormatting.BLUE + "Netherwart:", this.width / 4 * 3 + 10, this.height / 3 * 2, Int.MinValue());
     }
 
     protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
