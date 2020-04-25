@@ -17,12 +17,12 @@ import net.minecraft.world.World;
 public class PacketGreenhouse implements IMessage {
 
 	private boolean isMessageValid = false;
-	private static int x, y, z, xs, zs, p, s;
+	private static int x, y, z, xs, zs, p, s, sc, sp, sn;
 
 	public PacketGreenhouse() {
 	}
 
-	public PacketGreenhouse(int x, int y, int z, int xs, int zs, int p, int s) {
+	public PacketGreenhouse(int x, int y, int z, int xs, int zs, int p, int s, int sc, int sp, int sn) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -30,6 +30,9 @@ public class PacketGreenhouse implements IMessage {
 		this.zs = zs;
 		this.p = p;
 		this.s = s;
+		this.sc = sc;
+		this.sp = sp;
+		this.sn = sn;
 		this.isMessageValid = true;
 	}
 
@@ -42,6 +45,9 @@ public class PacketGreenhouse implements IMessage {
 		this.zs = buf.readInt();
 		this.p = buf.readInt();
 		this.s = buf.readInt();
+		this.sc = buf.readInt();
+		this.sp = buf.readInt();
+		this.sn = buf.readInt();
 		this.isMessageValid = true;
 	}
 
@@ -56,6 +62,9 @@ public class PacketGreenhouse implements IMessage {
 		buf.writeInt(this.zs);
 		buf.writeInt(this.p);
 		buf.writeInt(this.s);
+		buf.writeInt(this.sc);
+		buf.writeInt(this.sp);
+		buf.writeInt(this.sn);
 	}
 
 	public static class PacketGreenhouseHandler implements IMessageHandler<PacketGreenhouse, IMessage> {
@@ -66,22 +75,29 @@ public class PacketGreenhouse implements IMessage {
 			EntityPlayerMP player = ctx.getServerHandler().playerEntity;
 			TileEntityGreenhouse t = (TileEntityGreenhouse) w.getTileEntity(x, y, z);
 			int xBis = x + 1;
-			if(canAfford(w, x, y, z, p)) {
-				if(canCreate(w, xBis, y, z, xs, zs, s)) {
-					player.addChatMessage(new ChatComponentText(EnumChatFormatting.DARK_GREEN + "Construction de la serre"));
-					usePower(w, x, y, z, p);
-					create(w, xBis, y, z, xs, zs, s);
+			if(((s + sc + sp + sn) * 3) + y <= 255) {
+				if(canAfford(w, x, y, z, p)) {
+					if(canCreate(w, xBis, y, z, xs, zs, s, sc, sp, sn)) {
+						player.addChatMessage(new ChatComponentText(EnumChatFormatting.DARK_GREEN + "Un esclave arrive sur place!"));
+						usePower(w, x, y, z, p);
+						create(w, xBis, y, z, xs, zs, s, sc, sp, sn);
+					} else {
+						player.addChatMessage(new ChatComponentText(EnumChatFormatting.DARK_RED + "QUOI!"));
+						player.addChatMessage(new ChatComponentText(EnumChatFormatting.DARK_RED + "... T'es aveugle?"));
+						player.addChatMessage(new ChatComponentText(EnumChatFormatting.DARK_RED + "Tu ne voit pas les blocs là ?"));
+					}
 				} else {
-					player.addChatMessage(new ChatComponentText(EnumChatFormatting.DARK_RED + "Serre impossible à créer, des blocs sont déja présents."));
+					player.addChatMessage(new ChatComponentText(EnumChatFormatting.DARK_RED + "Manque d'énergie prenez un actimel! (ou une antenne)"));
 				}
 			} else {
-				player.addChatMessage(new ChatComponentText(EnumChatFormatting.DARK_RED + "Vous n'avez pas assez d'énergie disponible, créez une antenne !"));
+				player.addChatMessage(new ChatComponentText(EnumChatFormatting.DARK_RED + "Vous dépasseriez la hauteur maximale du jeu."));
+				player.addChatMessage(new ChatComponentText(EnumChatFormatting.DARK_RED + "On annule l'opération chef!"));
 			}
 			return null;
 		}
 		
-		public boolean canCreate(World w, int x, int y, int z, int xs, int zs, int s) {
-			int ys = s * 3;
+		public boolean canCreate(World w, int x, int y, int z, int xs, int zs, int s, int sc, int sp, int sn) {
+			int ys = (s + sc + sp + sn) * 3;
 			for(int i = 0; i < xs; i++) {
 				for(int j = 0; j < zs; j++) {
 					for(int k = 0; k < ys; k++) {
@@ -97,22 +113,34 @@ public class PacketGreenhouse implements IMessage {
 			return true;
 		}
 		
-		public void create(World w, int x, int y, int z, int xs, int zs, int s) {
+		public void create(World w, int x, int y, int z, int xs, int zs, int s, int sc, int sp, int sn) {
 			int yBis = y;
+			yBis = createStages(w, x, yBis, z, xs, zs, s, Blocks.farmland, Blocks.wheat);
+			createStages(w, x, yBis, z, xs, zs, s, Blocks.farmland, Blocks.wheat);
+			yBis = createStages(w, x, yBis, z, xs, zs, s, Blocks.farmland, Blocks.carrots);
+			createStages(w, x, yBis, z, xs, zs, s, Blocks.farmland, Blocks.carrots);
+			yBis = createStages(w, x, yBis, z, xs, zs, s, Blocks.farmland, Blocks.potatoes);
+			createStages(w, x, yBis, z, xs, zs, s, Blocks.farmland, Blocks.potatoes);
+			yBis = createStages(w, x, yBis, z, xs, zs, s, Blocks.soul_sand, Blocks.nether_wart);
+			createStages(w, x, yBis, z, xs, zs, s, Blocks.soul_sand, Blocks.nether_wart);
+		}
+		
+		public int createStages(World w, int x, int y, int z, int xs, int zs, int stages, Block a, Block b) {
 			for(int i = 0; i < s; i++) {
 				for(int j = 0; j < xs; j++) {
 					for(int k = 0; k < zs; k++) {
-						w.setBlock(x + j, yBis, z + k, Blocks.farmland);
+						w.setBlock(x + j, y, z + k, a);
 					}
-				} System.out.println(i + " stage | 1: added GRASS");
-				yBis++;
+				}
+				y++;
 				for(int j = 0; j < xs; j++) {
 					for(int k = 0; k < zs; k++) {
-						w.setBlock(x + j, yBis, z + k, Blocks.wheat);
+						w.setBlock(x + j, y, z + k, b);
 					}
-				} System.out.println(i + " stage | 2: adding WHEAT");
-				yBis += 2;
+				}
+				y += 2;
 			}
+			return y;
 		}
 		
 		public boolean canAfford(World w, int x, int y, int z, int p) {
